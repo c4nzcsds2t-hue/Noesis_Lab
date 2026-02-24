@@ -1,0 +1,120 @@
+\documentclass[12pt, a4paper]{ctexart}
+
+% 引入必要的宏包
+\usepackage{geometry}
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+% 颜色定义
+\definecolor{primary}{RGB}{41, 128, 185}
+\definecolor{secondary}{RGB}{44, 62, 80}
+
+% 标题格式设置
+\titleformat{\section}{\Large\bfseries\color{primary}}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries\color{secondary}}{\thesubsection}{1em}{}
+
+% 文档信息
+\title{\textbf{多智能体办公助手 Agent 项目设计书}\\ \large ——聚焦“学术与职场过渡”场景}
+\author{核心开发团队}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+本项目旨在开发一款聚焦于“学术与职场过渡场景”的办公助手 Agent 系统。针对学术界强调“深度、严谨、过程”与职场强调“效率、结论、可执行项（Action Items）”之间的痛点，本系统采用高扩展性的多智能体（Multi-Agent）架构，将复杂的自然语言指令拆解并调度，实现会议纪要、文献摘要、多语言润色以及跨平台高水准 PPT 生成的连续工作流闭环。
+\end{abstract}
+
+\vspace{1em}
+\hrule
+\vspace{1em}
+
+\section{核心架构设计：路由与多智能体协作}
+系统基于多智能体协作框架（如 LangGraph / CrewAI）构建，整体采用“一个主管（Router） + 四个专家（Experts）”的拓扑结构，确保工作流的上下文连贯性与极低的模块耦合度。
+
+\subsection{核心路由主管 (Router / Orchestrator)}
+作为系统的中央调度中枢，用户输入宏大目标指令后，主管 Agent 负责准确理解意图，将任务拆解为线性的子任务队列，并依次唤醒下属对应的专家进行处理。
+
+\subsection{专家智能体矩阵 (Expert Agents)}
+\begin{enumerate}
+    \item \textbf{学术研究员 (文献摘要 Agent)}
+    \begin{itemize}
+        \item \textit{功能：} 处理超长 PDF 英文文献，提取核心论点、实验数据和创新点。
+        \item \textit{技术实现：} 采用 RAG（检索增强生成）架构。核心差异化亮点在于引入 \textbf{卡片盒笔记法（Zettelkasten）}。系统不仅总结单篇文献，还能自动提取概念卡片，建立跨文献的理论知识互联机制。
+    \end{itemize}
+    
+    \item \textbf{行政秘书 (会议纪要 Agent)}
+    \begin{itemize}
+        \item \textit{功能：} 处理音频转写长文本，生成具备职场导向的结构化纪要。
+        \item \textit{技术实现：} 强制大模型以严格的 JSON 格式输出结构化数据，精准提取会议背景、核心决议，以及职场高度看重的 \textbf{待办事项（To-Do List）}（含负责人与截止周期）。
+    \end{itemize}
+
+    \item \textbf{跨国沟通专家 (多语言润色 Agent)}
+    \begin{itemize}
+        \item \textit{功能：} 提供深度的“语境与风格迁移 (Style Transfer)”。
+        \item \textit{技术实现：} 内置双向 Prompt 模板库。能够将冗长复杂的“学术态”表达，一键降维转换成要点式（Bullet points）的“商务态”汇报口吻；或反向将口语记录提升为科研级别的正式文段。
+    \end{itemize}
+
+    \item \textbf{视觉演示专家 (演示文档生成 Agent)}
+    \begin{itemize}
+        \item \textit{功能：} 将文本大纲自动转化为具有极高排版质量的演示文稿。
+        \item \textit{技术实现：} 结合学术极客路线，Agent 负责生成逻辑层级分明的 JSON 大纲，随后由底层代码直接生成 \textbf{Typst} 源码，并通过系统命令秒级编译为数学公式和图文排版完美的 PDF 学术演示文稿。
+    \end{itemize}
+\end{enumerate}
+
+\section{系统动态扩展性说明 (Plug-and-Play)}
+本多智能体架构具有极强的渐进式开发与平滑扩展能力，非常契合赛事的敏捷迭代需求：
+\begin{itemize}
+    \item \textbf{后端无缝接入：} 随时新增专家角色（如数据分析 Agent），只需新建 Python 类、赋予独立 System Prompt 及专属工具（如 Python 执行器），并将其注册至路由逻辑即可，无需重构现有链路。
+    \item \textbf{前端动态渲染：} 跨平台前端可根据后端 API 下发的数据动态生成功能组件，增加新 Agent 后侧边栏自动更新交互入口。
+\end{itemize}
+
+\section{大模型 API 混合选型策略}
+为平衡工程落地可行性、上下文处理能力及预算，系统采用“底层松耦合扩展 + 顶层多模型协作”的策略：
+
+\begin{table}[h]
+\centering
+% \textwidth 表示表格总宽度等于页面正文宽度
+% X 表示该列自动计算宽度并允许换行
+\begin{tabularx}{\textwidth}{@{}l l X@{}}
+\toprule
+\textbf{应用场景/Agent} & \textbf{推荐模型API} & \textbf{核心优势} \\ \midrule
+长文本阅读 / 会议转写 & \textbf{Kimi (月之暗面)} & 百万字级超长上下文、卓越的文档解析能力 \\
+逻辑路由 / 排版代码生成 & \textbf{DeepSeek-V3/R1} & 顶级逻辑推理、JSON结构化输出及代码生成极稳 \\
+综合调度 / 工具调用 & \textbf{智谱 GLM-4 / 通义千问} & Function Calling 稳定性极佳、生态接口完善 \\ \bottomrule
+\end{tabularx}
+\end{table}
+
+\section{技术栈与跨平台落地闭环}
+为在答辩环节展示具备产品完成度的方案，系统采取完全的前后端分离架构：
+\begin{itemize}
+    \item \textbf{后端（逻辑大脑）：} 采用 \textbf{Python (FastAPI)} 搭建底座，利用丰富的 AI 生态处理复杂的流式文本生成、PDF 解析和 Typst 编译调度。
+    \item \textbf{前端（跨平台触点）：} 采用 \textbf{Flutter} 框架。利用其 \texttt{Scaffold} 和优秀的状态管理机制，构建跨 Windows、Android 及 Web 的多端一致性体验。用户可以在移动端随时上传录音文件，并在应用内直观地管理项目（Projects）和待办事件（Events）列表，实现真正的贴身助理形态。
+\end{itemize}
+
+\section{核心业务场景展示 (User Story)}
+
+\begin{tcolorbox}[colback=gray!5, colframe=primary, title=\textbf{场景演示：课题组的周五下午}]
+\begin{enumerate}[label=\arabic*.]
+    \item \textbf{录音处理}：学生刚结束关于“微藻治理养殖场污水”的产学研联合组会。将 1 小时录音提交给 Agent，系统迅速提取会议纪要，明确合作方需要一份特定微藻株系吸附重金属效率的调研报告。
+    \item \textbf{文献沉淀}：学生批量导入相关生化领域的核心英文文献。Agent (结合 Zettelkasten) 快速提取核心机理，生成中文研读摘要，并自动与过往笔记关联。
+    \item \textbf{风格转换}：学生基于摘要撰写了一段极其硬核的学术总结。Agent 将其瞬间润色为一封重点突出、得体的英文商务进度邮件，准备发送给企业对接人。
+    \item \textbf{文档渲染}：指令下达：“汇总核心数据，生成下周一的组会汇报材料”。Agent 自动抽取大纲，调用后端脚本生成优雅的 Typst 排版代码，并当场返回一份图文并茂的 PDF 演示幻灯片。
+\end{enumerate}
+\end{tcolorbox}
+
+\section{开发过程避坑指南}
+\begin{itemize}
+    \item \textbf{大模型幻觉与格式渲染：} 坚决避免让 LLM 直接输出海量的排版标记代码（极易遗漏闭合标签）。最佳实践为：LLM 仅负责输出纯净的内容结构（JSON），由 Python 逻辑层负责最终的文档渲染或模板套用。
+    \item \textbf{上下文溢出管理：} 会议长文本输入前，务必实现合理的分块（Chunking），并优先调度具备长上下文窗口的模型（如 Kimi）处理初始降噪。
+    \item \textbf{提示词工程物理隔离：} “学术态”与“职场态”必须使用完全隔离的两套系统提示词模板，通过变量做强切换，以保证输出风格不被污染。
+\end{itemize}
+
+\end{document}
