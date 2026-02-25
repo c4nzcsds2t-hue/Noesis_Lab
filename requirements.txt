@@ -1,0 +1,27 @@
+# ── Web 框架 ──
+fastapi==0.133.0
+uvicorn[standard]==0.41.0
+
+# ── 数据校验 ──
+pydantic==2.12.5
+
+# ── LLM 调用（DeepSeek / Kimi / GLM 均兼容 OpenAI SDK）──
+openai==2.24.0
+
+# ── PDF 解析 ──
+pymupdf==1.27.1          # 也叫 fitz，解析 PDF 文本和图片
+pdfplumber==0.11.9       # 表格提取效果更好，可与 pymupdf 互补
+
+# ── 音频转写（会议 Agent 用）──
+# openai-whisper==20231117   # 本地 Whisper，显存不够可注释掉
+# 替代方案：直接调 Kimi / 讯飞 的语音转文字 API
+
+# ── 环境变量管理 ──
+python-dotenv==1.2.1
+
+# ── 异步 HTTP（调用外部 API 时用）──
+httpx==0.28.1
+
+# ── 工具库 ──
+python-multipart==0.0.22  # FastAPI 上传文件需要
+tenacity==9.1.4          # 重试装饰器，比手写 for loop 优雅
